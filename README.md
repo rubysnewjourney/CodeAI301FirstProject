@@ -82,11 +82,17 @@ saleor/
 └── ...
 
 **Each app follows a consistent pattern:**
+
 schema.py — GraphQL queries and mutations
+
 types.py — GraphQL type definitions
+
 filters.py — filter input classes
+
 sorters.py — sorting input classes
+
 dataloaders.py — efficient batch data loading
+
 tests/ — pytest test suite
 
 **The Saleor Ecosystem**
