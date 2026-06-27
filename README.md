@@ -9,6 +9,112 @@ My First open source project for CodePath AI 301
 **Issue:** https://github.com/saleor/saleor/issues/12520  
 **Status:** Phase IV — Complete | PR Submitted | Tests Written | Maintainer Feedback Addressed | Respond to maintainer feedback | Push revisions | Awaiting Re-review
 
+**Background about my open source issue:**
+
+**Saleor — High-Level Project Summary**
+
+Repository: https://github.com/saleor/saleor
+ Stars: 22.9k | Forks: 6k | Language: Python 99.2%
+ License: BSD-3-Clause (open source, free to use)
+
+**What Is Saleor?**
+Saleor is an open source, headless, API-only e-commerce platform built for developers. Rather than a traditional all-in-one shop platform (like Shopify or WooCommerce), Saleor exposes everything through a GraphQL API — the frontend, mobile app, or dashboard connects to it however the developer chooses.
+Think of it like this:
+Traditional e-commerce = the store, the backend, and the checkout are all bundled together
+Saleor = just the backend and API — developers build their own storefront on top of it using any technology they want
+
+**Core Technology Stack**
+Layer
+Technology
+Language
+Python 3.12
+Web framework
+Django
+API
+GraphQL (via Graphene-Django)
+Database
+PostgreSQL
+Cache / queues
+Redis (Valkey)
+Task runner
+Celery
+Package manager
+uv
+Testing
+pytest
+
+**Key Design Principles**
+1 — GraphQL only Every single interaction with Saleor — reading products, placing orders, managing customers — goes through a GraphQL API. There is no REST API, no fragmentation.
+2 — Headless and API-only Saleor has no built-in storefront. The frontend is completely decoupled — developers build it with whatever stack they prefer (Next.js, React, mobile apps, etc.).
+3 — Technology agnostic No plugin architecture that locks you into Python or Django. Extensions are built as independent apps that communicate via webhooks — they can be written in any language.
+4 — Native multichannel Every aspect of the store — pricing, currencies, stock, products — can be configured per channel. A single Saleor instance can run multiple stores in different countries with different currencies simultaneously.
+5 — Open source, single version No paid "enterprise edition" with hidden features. Everything is in the public repo under BSD-3-Clause license.
+
+**What Saleor Can Do (Feature Set)**
+**Area**    **  Capabilities  **
+Products      Rich content model, variants, attributes, categories, collections 
+Orders        Flexible order model, split payments, multi-warehouse, returns
+Checkout      Advanced tax and payment options, discounts, promotions
+Customers     Order history, preferences, addresses
+Payments      Multi-gateway, extensible payment API, any payment method
+Promotions    Sales, vouchers, cart rules, gift cards
+Channels      Per-channel pricing, currency, stock, and product visibility
+Content       CMS for product and marketing content
+Translations  Fully translatable catalog
+Apps          Extend via webhooks, metadata, iframe dashboard extensions
+Dashboard     Separate admin UI repo (saleor/saleor-dashboard)
+
+**How Saleor Is Structured (Code)**
+
+**All application code lives in the saleor/ directory, organized by domain:**
+
+saleor/
+├── graphql/           ← All GraphQL schema, types, resolvers, filters, sorters
+│   ├── account/       ← User, customer, staff queries & mutations
+│   ├── checkout/      ← Checkout queries & mutations  ← YOUR CONTRIBUTION IS HERE
+│   ├── order/         ← Order queries & mutations
+│   ├── product/       ← Product catalog
+│   └── ...
+├── account/           ← Django models for users
+├── checkout/          ← Django models for checkouts
+├── order/             ← Django models for orders
+├── payment/           ← Payment logic
+└── ...
+
+**Each app follows a consistent pattern:**
+schema.py — GraphQL queries and mutations
+types.py — GraphQL type definitions
+filters.py — filter input classes
+sorters.py — sorting input classes
+dataloaders.py — efficient batch data loading
+tests/ — pytest test suite
+
+**The Saleor Ecosystem**
+Saleor Core (this repo) is just one piece of a larger ecosystem:
+
+**Component          Repo                        Purpose**
+Saleor Core      saleor/saleor                The GraphQL API backend (this repo)
+Dashboard        saleor/saleor-dashboard      React admin UI for store management
+Storefront       saleor/storefront            Example Next.js storefront
+Platform         saleor/saleor-platform       Docker Compose to run all components together
+CLI              saleor/saleor-cli            Command line tool for developers
+Docs             saleor/saleor-docs           Documentation site
+
+**Where Your Contribution Fits**
+Your PR #19363 touches saleor/graphql/account/types.py — right at the heart of the GraphQL layer. Specifically:
+The User type definition in the GraphQL schema
+The checkouts field on the User type
+The resolver that fetches checkouts for a user
+By adding sortBy and filter to User.checkouts, you improved API consistency across the entire platform — making the developer experience more predictable for anyone building on top of Saleor's GraphQL API.
+
+**Community & Scale**
+22,900+ GitHub stars — one of the most popular open source e-commerce projects
+6,000+ forks — widely adopted and extended
+22,464 commits — actively maintained since 2013
+186 open issues — healthy backlog of improvements
+Active Discord community at saleor.io/discord
+Saleor Cloud — hosted version for teams that don't want to self-host
+
 ## Why I Chose This Issue
 
 I chose this issue because I immediately understood the confusion it creates for developers: the global checkouts query supports filtering and sorting, but the User.checkouts field does not. This inconsistency makes the API harder to use and breaks the expectation that similar fields behave similarly. Since I've been learning how GraphQL schemas are structured and how resolvers work, this felt like a great opportunity to apply that knowledge in a real project.
