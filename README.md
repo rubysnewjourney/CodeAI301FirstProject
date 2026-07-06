@@ -3,7 +3,7 @@
 Open source project for CodePath AI 301:
 
 ------------------------------------------------------------------------------------------
-Previous Contribution #2
+Current Contribution #2
 ------------------------------------------------------------------------------------------
 
 Contribution [2]: [fix: test_json.py is not being run]
