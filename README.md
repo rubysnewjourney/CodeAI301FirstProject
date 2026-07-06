@@ -1,4 +1,4 @@
-# CodeAI301FirstProject
+# AI301 Open Source contributions
 
 Open source project for CodePath AI 301:
 
