@@ -11,7 +11,8 @@ Contribution [2]: [fix: test_json.py is not being run]
 **Contribution Number:** 2  
 **Student:** Ruby Khatoon  
 **Issue:** (https://github.com/ossf/cve-bin-tool/issues/5689) 
-**Status:** Phase I | Sent a message to claim the issue if not being worked in a polite way as shown below
+**Status:** Phase I | Sent a message to claim the issue if not being worked in a polite way as shown below| still waiting for update as of 07/11/2026| Planning to proceed with fix and share the PR soon and see if there will be any update from the maintainer.
+**Status:** - I had an update on my contribution 1. I had hear back on a conflict with merging and I resolved this week. The details are avialable bottom section of the Phase4 of the contribution 1.
 
 Message for the open Issue: @alex-ter -Hello there, I noticed you've been assigned this for a couple of weeks — are you still actively working on it? No pressure at all, just wanted to check before doing any investigation myself. Happy to collaborate or wait if you're close to a PR. Thanks for your time.
 
@@ -60,8 +61,7 @@ Previous Contribution #1
 **Contribution Number:** 1  
 **Student:** Ruby Khatoon  
 **Issue:** https://github.com/saleor/saleor/issues/12520  
-**Status:** Phase IV — Complete | PR Submitted | Tests Written | Maintainer Feedback Addressed | Respond to maintainer feedback | Push revisions | Awaiting Re-review
-
+**Status:** Phase IV — Complete | PR Submitted | Tests Written | Maintainer Feedback Addressed | Respond to maintainer feedback | Push revisions | Merging Conflict Resolved | Awaiting Final Approval
 **Background about my open source issue:**
 
 **Saleor — High-Level Project Summary**
@@ -520,6 +520,27 @@ All 33 tests in `test_me.py` pass. Fixes pushed in updated commit `f513311`. PR 
 - **Approach decisions:** Reused existing `CheckoutFilterInput`, `CheckoutSortingInput`, and `FilterConnectionField` — no new classes created. Added `ADDED_IN_324` labels to both new arguments. Updated resolver to conditionally convert dataloader list to queryset only when filter/sort args present. Added `validate_and_apply_search_rank_sorting` to handle RANK sort edge case. Regenerated `schema.graphql`. Windows-specific workarounds (`rlimit.py`, `pyproject.toml`) kept off the PR branch and saved on `windows-dev-setup` branch.
 
 **Status:** Awaiting review
+**Week 6 follow up**
+
+I followed up with a friendly reminder
+I received an automated update on merge conflict and the merge conflict is resolved. 
+
+Below is the updat so far post the conflict merge resolution
+**previously done:**
+All 4 maintainer feedback points
+Addressed 5 tests passing
+All 33 test_me.py tests pass
+schema.graphql regenerated 
+**Latest changes:**
+Merge conflict resolved 
+FixedBranch synced with latest upstream 
+On 697b9ec6f Comment posted to prompt re-review
+
+I posted an update to the maintainers both on Github and also the discord channel
+as shown below:
+**Discord:** Hello @wcislo-saleor & @stmpn — resolved the merge conflict from the recent ADDED_IN cleanup commit (af4ddf5). Branch is now up to date with main and ready for re-review! This is for the PR - https://github.com/saleor/saleor/pull/19363
+
+**GitHub:** Hello @wcislo-saleor & @stmpn — resolved the merge conflict from the recent ADDED_IN cleanup commit (af4ddf5). Branch is now up to date with main and ready for re-review!
 
 ## Learnings & Reflections
 
