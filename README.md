@@ -6,15 +6,179 @@ Open source project for CodePath AI 301:
 Current Contribution #3
 ------------------------------------------------------------------------------------------
 
-Contribution [3]: [fix: test_json.py is not being run]
+Contribution Number: 3
+Student: Ruby Khatoon
+Issue: [feat: add deleteFile tool #14](https://github.com/HoussemEddineChaouch/mini-agent-cli/issues/14)
+Status: PR submitted and maintainer requested Changes (in review)
 
-**Contribution Number:** 3 
-**Student:** Ruby Khatoon  
-**Issue:** (https://github.com/HoussemEddineChaouch/mini-agent-cli/issues/14)
-**Status:** Phase I | Sent a message to claim the issue on 07/12/2026| 
+## High-Level Project Summary
 
-**Message to the maintainer:**
-@HoussemEddineChaouch - I would be interested to work on this issue if this is still available. Please let me know. I'm looking forward to hearing back from you. Thanks!
+`mini-agent-cli` is a lightweight CLI AI agent built in Node.js that uses Google Gemini through a simple tool-calling loop. It can already read files, write files, list directories, fetch URLs, and run shell commands — each one wired up as a "tool" the LLM can call when it decides it needs to. This contribution adds a `deleteFile` tool, so the agent can finally delete a file, not just read/write/list them.
+
+## Why I Chose This Issue
+
+It was labeled `good first issue` and nobody had picked it up yet. I liked that it fit neatly into a pattern the codebase already had going — one function in `functions.js`, one entry in `tools.js` — so it felt like a manageable contribution to this repo, but still one where I'd actually have to understand how the pieces fit together (the tool registry, the agent loop, the error handling) instead of just tweaking a string somewhere.
+
+---
+
+## Understanding the Issue
+
+### Problem Description
+The agent could read, write, and list files, and pull content from URLs — but had no way to delete a file. Basic gap in file management.
+
+### Expected Behavior
+A `deleteFile` tool the agent can call with a path, which deletes the file and returns a clear message either way — success, or "that file doesn't exist" — matching how the other tools already behave.
+
+### Current Behavior
+Nothing. There was no delete option at all; you'd have to leave the agent entirely to remove a file.
+
+### Affected Components
+- `src/functions.js` — where the actual tool logic lives
+- `src/tools.js` — the registry that tells Gemini what tools exist and how to call them
+- `src/agent.js` — has a hardcoded list of examples that teaches Gemini how to format each tool call
+- `README.md` — the tools table in the docs
+
+---
+
+## Reproduction Process
+
+### Environment Setup
+
+**Prerequisites installed:**
+- Node.js (v24.15.0) and npm
+- Git
+
+**Services started via Docker:** None needed — it's just a local Node CLI, no Docker involved.
+
+**Dependencies and hooks:**
+```bash
+npm install
+```
+Had to run this as `cmd /c "npm install"` instead of directly, because PowerShell's execution policy blocked `npm.ps1` from running on my machine (Windows).
+
+### Steps to Reproduce
+This one was a feature request, not a bug, so there wasn't really anything broken to reproduce. Instead I spent time getting the app running locally and actually reading the existing code before touching anything:
+1. Cloned the repo, ran `npm install`.
+2. Read through `functions.js`, `tools.js`, and `agent.js` to figure out the pattern other tools followed — how each function handles errors, what it returns, and how `agent.js` calls `tool.func(...)` with its own try/catch wrapped around it.
+3. Checked `package.json` and confirmed there's no test framework set up in this project at all.
+
+### Reproduction Evidence
+Not applicable here since it's a feature, not a bug — the closest thing to "evidence" was just confirming the existing tools' behavior firsthand before writing anything new.
+
+---
+
+## Solution Approach
+
+### Analysis
+I read exactly how `writeFile` handles errors — it only catches `ENOENT` and lets everything else throw. At first I wasn't sure if that was too minimal, but then I found that `agent.js` already wraps every tool call in its own try/catch and turns any thrown error into a friendly "Tool failed: ..." message. So the two-layer design is intentional: each tool only needs to handle its one expected failure case, and the agent handles the rest.
+
+### Proposed Solution
+Add a `deleteFile(path)` function using `fs.unlinkSync`, built to match `writeFile` almost exactly — plain success string, friendly message for `ENOENT`, everything else thrown — plus register it in `tools.js` the same way the other tools are registered.
+
+### Implementation Plan
+
+**Plan:**
+1. Write `deleteFile` in `functions.js`, register it in `tools.js`.
+2. Test it locally with a quick throwaway script — no framework, no API key needed.
+3. Branch, commit, and open a PR following `CONTRIBUTING.md`.
+
+**Implement:**
+- Branch: `feat/add-delete-file-tool`
+- First commit: [`0b1aace`](https://github.com/rubysnewjourney/mini-agent-cli/commit/0b1aaceb29b79fe69a3c5e3734c5abe0c915aa91) — `feat: add deleteFile tool`
+- Follow-up commit: `docs: add deleteFile example to agent.js and README tools table`
+- Fix commit: `fix: restore runCommand formatting and reorder module.exports`
+
+**Review:**
+
+* Opened PR #30 against `HoussemEddineChaouch:main`
+* Round 1 — another contributor, `@abusnitsky`, suggested I follow the repo's actual PR template instead of the custom description I'd written; the maintainer agreed
+* Round 2 — maintainer asked for two more things: a `deleteFile` example in `agent.js`, and a row in the README's tools table
+
+**Evaluate:**
+- Both rounds of feedback are addressed and pushed. Waiting on the maintainer to take another look.
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+No test framework exists in this repo, so I wrote a small standalone Node script that called `deleteFile` directly, no API key or agent loop involved:
+- **Success case:** made a temp file, deleted it, checked I got back `"File deleted successfully"` and that the file was actually gone.
+- **Missing file:** ran it against a path that didn't exist — got the friendly "does not exist" message back instead of a crash.
+- **Directory case:** ran it against a folder on purpose, just to see what happens. It threw `EPERM` (that's the Windows behavior — on Linux/macOS it'd be `EISDIR` instead), which is exactly what I wanted since I'd decided *not* to special-case directories and just let the agent's existing error handling catch it.
+
+### Integration Tests
+Didn't get to run the agent end-to-end with Gemini since I don't have a `GEMINI_API_KEY` yet. I was upfront about that in the PR rather than pretending it was tested.
+
+---
+
+## Implementation Notes
+
+- Stuck closely to the existing style rather than doing my own thing — same error handling pattern as `writeFile`, same description style in `tools.js`.
+- Deliberately didn't add a testing framework even though the repo has none — that felt like a bigger decision than this issue called for, so I left it out.
+- Partway through review, another PR (`runCommand`, from a different contributor) got merged into `main` before mine, which caused a real merge conflict in `functions.js`. I merged `main` into my branch and resolved it by hand rather than force-pushing over their work.
+- While resolving that conflict, my editor quietly reformatted some blank lines inside the unrelated `runCommand` function and I accidentally left `deleteFile` out of order in the exports line. Caught both by diffing carefully afterward and fixed them in a separate follow-up commit so the final PR diff stayed clean.
+
+---
+
+## Maintainer Feedback
+
+### Pull Request
+
+**PR Link:** [#30 — feat: add deleteFile tool](https://github.com/HoussemEddineChaouch/mini-agent-cli/pull/30)
+
+**PR Description** (rewritten to follow the repo's `PULL_REQUEST_TEMPLATE.md`):
+> **What does this PR do?**
+> Adds a `deleteFile` tool that removes a file from disk via `fs.unlinkSync`, matching the existing `readFile`/`writeFile`/`listDir` pattern in `functions.js` and `tools.js`. Returns "File deleted successfully" on success, a friendly message for missing files (ENOENT), and lets other errors (e.g. attempting to delete a directory) propagate up to be caught by `agent.js`'s existing error handling — consistent with `writeFile`'s approach.
+>
+> **Type of change:** New feature / tool
+>
+> **How to test it:** Ran a standalone script (no framework, no API key needed) calling `deleteFile` directly from `functions.js` — success case, missing-file case, and directory case (confirms `EPERM` on Windows, surfaced via `agent.js`'s existing try/catch).
+>
+> **Related issues:** Closes #14
+
+**What the maintainer actually said:**
+> First, `@abusnitsky` (another contributor) chimed in suggesting I follow the repo's PR template. The maintainer agreed:
+>
+> *"Hey @rubysnewjourney, great work! 🙌 Could you update the PR description to follow the repo's PR template? (What does this PR do / Type of change / How to test it) Then I'll review and merge!"*
+>
+> After I updated it, he came back with two more asks:
+>
+> *"Hey @rubysnewjourney, great work! One thing, agent.js has an examples list that teaches Gemini how to call each tool. deleteFile needs one too otherwise Gemini might not use it correctly. Also add deleteFile to the README tools table and fill in the PR description template. Fix those and this is ready to merge!"*
+
+### Code Changes
+- `src/functions.js` — added `deleteFile(path)`
+- `src/tools.js` — registered `deleteFile`
+- `src/agent.js` — added a `deleteFile` example to the Examples list
+- `README.md` — added `deleteFile` to the tools table
+- One merge commit to reconcile the conflict with `runCommand`, plus a small fix commit cleaning up formatting/ordering that got messed up during that merge
+
+---
+
+## Learnings & Reflections
+
+### Challenges Overcome
+- PowerShell blocked `npm install` outright — got around it with `cmd /c "npm install"` instead of changing system-wide settings.
+- Realized partway through that `origin` was pointed at the original repo, not my fork — forked it, added a second remote (`fork`), and pushed there instead. Caught this before it caused a failed push, not after.
+- A text editor silently saved my test script as `test-deleteFile.js.txt` instead of `.js`, which gave a confusing "module not found" error until I actually listed the directory and saw the real filename.
+- Copied a PR description template from someone else's already-merged PR at first, which turned out to be the wrong move — went and found the repo's actual `PULL_REQUEST_TEMPLATE.md` file instead once a reviewer pointed it out.
+- Had to resolve a real merge conflict when another tool (`runCommand`) got merged into `main` while my PR was still open — first actual merge conflict I've walked through carefully rather than just accepting one side.
+- Spent longer than I'd like admitting on a git diff command that kept showing "no changes" even after I'd clearly edited the file — turned out I was comparing two commits instead of my actual uncommitted changes. Switching the command is what finally showed the truth.
+
+### What I'd Do Differently Next Time
+- Check for a PR template file right at the start, before writing any PR description, instead of finding out the hard way after a reviewer flags it. Eventhough I had read it before and knew I should follow the expected format but this was a total miss and realized after submitting it and I should have changed it right after.
+- After resolving any merge conflict, diff the whole file again — not just the part that conflicted — to catch anything my editor quietly changed on the side.
+- If a command keeps giving me the same "nothing changed" result more than once, stop and try a different way of checking instead of running it again hoping for something different.
+
+---
+
+## Resources Used
+- [Issue #14](https://github.com/HoussemEddineChaouch/mini-agent-cli/issues/14)
+- [Pull Request #30](https://github.com/HoussemEddineChaouch/mini-agent-cli/pull/30)
+- The repo's own `README.md`, `CONTRIBUTING.md`, and `.github/PULL_REQUEST_TEMPLATE.md`
+- `src/functions.js`, `src/tools.js`, `src/agent.js` — read directly rather than assumed
+- Node.js docs and a few GitHub issues on how `fs.unlinkSync` behaves differently on Windows (`EPERM`) vs. POSIX (`EISDIR`) when you try to delete a directory
+- Git docs on merging, remotes, and forks
 
 ------------------------------------------------------------------------------------------
 Current Contribution #2
@@ -25,8 +189,8 @@ Contribution [2]: [fix: test_json.py is not being run]
 **Contribution Number:** 2  
 **Student:** Ruby Khatoon  
 **Issue:** (https://github.com/ossf/cve-bin-tool/issues/5689) 
+
 **Status:** Phase I | Sent a message to claim the issue if not being worked in a polite way as shown below| still waiting for update as of 07/11/2026| Planning to proceed with fix and share the PR soon and see if there will be any update from the maintainer.
-**Status:** - I had an update on my contribution 1. I had hear back on a conflict with merging and I resolved this week. The details are avialable bottom section of the Phase4 of the contribution 1.
 
 **Lighting Talk presentation to the Class AI301 on 07/08/2026:**
 I also got a chance to do the lighting talk presentation to the class 07/08/2026. 
@@ -80,6 +244,9 @@ Previous Contribution #1
 **Student:** Ruby Khatoon  
 **Issue:** https://github.com/saleor/saleor/issues/12520  
 **Status:** Phase IV — Complete | PR Submitted | Tests Written | Maintainer Feedback Addressed | Respond to maintainer feedback | Push revisions | Merging Conflict Resolved | Awaiting Final Approval
+
+**Latest Status:** - I had an update on my contribution 1. I had hear back on a conflict with merging and I resolved this week. The details are avialable bottom section of the Phase4 of the contribution 1.
+
 **Background about my open source issue:**
 
 **Saleor — High-Level Project Summary**
