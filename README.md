@@ -3,13 +3,13 @@
 Open source project for CodePath AI 301:
 
 ------------------------------------------------------------------------------------------
-Current Contribution #3
+Current Contribution #2
 ------------------------------------------------------------------------------------------
 
-Contribution Number: 3
+Contribution Number: 2
 Student: Ruby Khatoon
 Issue: [feat: add deleteFile tool #14](https://github.com/HoussemEddineChaouch/mini-agent-cli/issues/14)
-Status: PR submitted and maintainer requested Changes (in review)
+Status: Phase1 completed | Phase2 Completed | Phase 3 Completed | Phase 4 completed | PR submitted and maintainer requested Changes (in review)| Waiting for final Approval
 
 ## High-Level Project Summary
 
@@ -179,18 +179,6 @@ Didn't get to run the agent end-to-end with Gemini since I don't have a `GEMINI_
 - `src/functions.js`, `src/tools.js`, `src/agent.js` — read directly rather than assumed
 - Node.js docs and a few GitHub issues on how `fs.unlinkSync` behaves differently on Windows (`EPERM`) vs. POSIX (`EISDIR`) when you try to delete a directory
 - Git docs on merging, remotes, and forks
-
-------------------------------------------------------------------------------------------
-Current Contribution #2
-------------------------------------------------------------------------------------------
-
-Contribution [2]: [fix: test_json.py is not being run]
-
-**Contribution Number:** 2  
-**Student:** Ruby Khatoon  
-**Issue:** (https://github.com/ossf/cve-bin-tool/issues/5689) 
-
-**Status:** Phase I | Sent a message to claim the issue if not being worked in a polite way as shown below| still waiting for update as of 07/11/2026| Planning to proceed with fix and share the PR soon and see if there will be any update from the maintainer.
 
 **Lighting Talk presentation to the Class AI301 on 07/08/2026:**
 I also got a chance to do the lighting talk presentation to the class 07/08/2026. 
