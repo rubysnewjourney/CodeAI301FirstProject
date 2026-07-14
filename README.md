@@ -12,7 +12,7 @@ Current Contribution #3
 
 **Issue:** [DataQualityPipeline.warnings leaks state between run() calls · Issue #1 · AshayK003/XadaptiveEDA](https://github.com/AshayK003/XadaptiveEDA/issues/1)
 
-**Status:** Phase1 completed | Phase2 completed | Phase3 completed | Phase 4 compeletd| PR #13 submitted — awaiting maintainer review *(update on merge)*
+**Status:** Phase1 completed | Phase2 completed | Phase3 completed | Phase 4 compeletd | PR #13 submitted | MERGED — PR #13 merged and Issue #1 closed on first review, no change requests
 
 ---
 
@@ -131,7 +131,7 @@ Two changes, both discussed with and approved by the maintainer before implement
 - PR: https://github.com/AshayK003/XadaptiveEDA/pull/13
 
 **Review:**
-- Awaiting maintainer review *(update with outcome)*
+- Merged on first review with no change requests. Maintainer's review: the fix pattern was called "textbook" (reset before computation, snapshot on assign) and Test 13 was noted as cleanly covering both the leak and aliasing cases.
 
 **Evaluate:**
 - Same reproduction script, before vs. after — both defects gone, run 1 behavior unchanged
@@ -174,13 +174,13 @@ BUG 2 (report aliasing): not present
 
 **PR Link:** https://github.com/AshayK003/XadaptiveEDA/pull/13
 
-**PR Description:** Structured as Fixes #1 → What was happening → Changes → Testing → review tag. The `Fixes #1` linkage was confirmed in the PR sidebar (merging will auto-close the issue).
+**PR Description:** Structured as Fixes #1 → What was happening → Changes → Testing → review tag. The `Fixes #1` linkage worked as intended — Issue #1 was automatically closed when the PR merged.
 
 **Copy of the maintainer feedback:**
 
 1. On my claim comment: *"Assigned! Go ahead — your plan looks solid. Let me know if you hit anything unexpected."*
 2. On my scope-check comment (raising the aliasing finding): *"Good catch — that's a real gap and closely related to the original issue. Since fixing `self.warnings = []` at the start of `run()` would make the aliasing less visible but wouldn't protect a caller holding onto a report reference, both fixes belong in the same PR. Go ahead and include both: 1. `self.warnings = []` at the start of `run()` 2. `report.warnings = list(self.warnings)` (copy, not alias). Makes the fix complete. Tag me when the PR is up and I'll review it."*
-3. *(PR review feedback — to be added when received)*
+3. PR review (merge): *"Reviewed and merged. The two-line fix is textbook — reset before computation, snapshot on assign. Test 13 covers both the leak and aliasing cases cleanly. Good work. Thanks for the contribution!"* — Pull request successfully merged and closed.
 
 ## Code Changes
 
@@ -233,15 +233,17 @@ Plus Test 13 in `test_data_quality.py` (reuses a single pipeline instance across
 - GitHub docs (PR template locations: root, `docs/`, `.github/` — used to verify none exists in this repo)
 - Python interactive shell + `repro_issue_1.py` for reproduction and identity (`is`) verification
 
-
 ------------------------------------------------------------------------------------------
 Current Contribution #2
 ------------------------------------------------------------------------------------------
 
-Contribution Number: 2
-Student: Ruby Khatoon
-Issue: [feat: add deleteFile tool #14](https://github.com/HoussemEddineChaouch/mini-agent-cli/issues/14)
-Status: Phase1 completed | Phase2 Completed | Phase 3 Completed | Phase 4 completed | PR submitted and maintainer requested Changes (in review)| Waiting for final Approval
+**Contribution Number**: 2
+
+**Student**: Ruby Khatoon
+
+**Issue**: [feat: add deleteFile tool #14](https://github.com/HoussemEddineChaouch/mini-agent-cli/issues/14)
+
+**Status**: Phase1 completed | Phase2 Completed | Phase 3 Completed | Phase 4 completed | PR submitted and maintainer requested Changes (in review)| Waiting for final Approval
 
 ## High-Level Project Summary
 
