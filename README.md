@@ -10,7 +10,7 @@ Current Contribution #4 - Documentation Only
 
 **Issue**: Add migration guide from standalone MCP servers to relay (valtors/relay #30)
 
-**Status**: Assigned, in progress — guide drafted, environment setup pending
+**Status**: Phase 1 Completed | Phase 2 in progress
 
 ## High-Level Project Summary
 
