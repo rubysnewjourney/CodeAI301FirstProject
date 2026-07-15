@@ -1,6 +1,216 @@
 # AI301 Open Source contributions
 
 Open source project for CodePath AI 301:
+------------------------------------------------------------------------------------------
+Current Contribution #4 - Documentation oOnly
+------------------------------------------------------------------------------------------
+
+**Contribution Number**: 4
+**Student**: Ruby Khatoon
+**Issue**: Add migration guide from standalone MCP servers to relay (valtors/relay #30)
+**Status**: Assigned, in progress — guide drafted, environment setup pending
+
+## High-Level Project Summary
+
+Relay is a Go-based, single-binary MCP (Model Context Protocol) server built
+by Tamish Mhatre (`valtors/relay`, MIT licensed). It bundles 40 tools across
+7 categories (File, Image, PDF, Text, Data, Web, Workflow) into one binary,
+so users don't need to install and configure multiple standalone MCP servers
+separately. Installable via `npx userelay tui` or `relay init`, which
+auto-detects the user's editor (Claude Desktop, Cursor, VS Code) and writes
+the config.
+
+## Why I Chose This Issue
+
+Labeled `good first issue` + `documentation` — no code changes required, just
+a new markdown file (`docs/migrate-to-relay.md`). Good fit for building
+confidence with the contribution workflow (claiming an issue, working with a
+maintainer, opening a PR) without the added complexity of a code change.
+
+## Understanding the Issue
+
+### Problem Description
+No guide currently exists to help users migrating from multiple standalone
+MCP servers (e.g. a memory server, a fetch server, a screenshot server) over
+to Relay's single-binary approach.
+
+### Expected Behavior
+A new `docs/migrate-to-relay.md` file showing side-by-side config comparisons
+(multiple servers → single Relay entry), a mapping of old standalone-server
+tool names to Relay's actual tool names, and before/after Claude Desktop
+config examples.
+
+### Current Behavior
+No migration documentation exists. Users have to manually figure out the
+config change and tool-name equivalents themselves.
+
+### Affected Components
+Documentation only (`docs/` directory). No source code changes.
+
+## Reproduction Process
+
+(Docs-issue equivalent of reproduction: verifying the issue's technical
+claims against the actual codebase before writing anything.)
+
+### Environment Setup
+- **Prerequisites installed:** Git (already available). Go — not yet
+  installed at time of writing; install in progress.
+- **Services started via Docker:** None — this repo does not use Docker for
+  this contribution.
+- **Dependencies and hooks:** None yet exercised; pending Go install to run
+  `go run . tools --json` or `go build`.
+
+### Steps Taken
+1. Read the issue (#30) in full, noting three specific tool-name claims to
+   verify: "relay memory tools," "relay fetchURL tool," "relay screenshot
+   tool."
+2. Read `docs/FIRST_PR.md` — confirmed the repo's norm is to comment on an
+   issue to claim it (no formal "please assign" process beyond that).
+3. Identified the maintainer (`tamish560`) as the sole visible contributor,
+   who also authored the issue.
+4. Posted a claiming comment on the issue.
+5. Forked the repo to `rubysnewjourney/relay` and cloned it locally to
+   `C:\Users\rubys\Projects\AI301\relay`.
+6. Attempted `go run . tools --json` to get the live tool registry —
+   discovered Go was not installed locally.
+7. Used `dir tools` to inspect the `tools/` directory structure instead,
+   confirming no `memory.go` file exists among the 15 tool-category files
+   present.
+8. Read `tools/registrations.go` directly (the actual tool-registration
+   source) to get the definitive, authoritative tool list.
+
+### Reproduction Evidence
+`tools/registrations.go` shows 7 registration functions
+(`registerFileTools`, `registerImageTools`, `registerPDFTools`,
+`registerDataTools`, `registerTextTools`, `registerWebTools`,
+`registerWorkflowTools`), registering exactly 40 tools total — matching the
+README's advertised count. No memory-related registration exists anywhere
+in the file. The `web` category registers only `web_fetch` and `web_status`
+— no screenshot tool.
+
+This directly contradicted three claims in the original issue text:
+| Issue claimed | Source shows |
+|---|---|
+| "relay memory tools" | Does not exist — no memory category/tool anywhere |
+| "relay fetchURL tool" | Actual name is `web_fetch` |
+| "relay screenshot tool" | Does not exist — `web` category only has `web_fetch`, `web_status` |
+
+Posted these findings as a clarifying comment on the issue, citing the exact
+file (`tools/registrations.go`) and asking whether to drop the memory/
+screenshot references or document them differently.
+
+## Solution Approach
+
+### Analysis
+The issue's tool-name claims appear to be stale relative to the current
+codebase (likely written before some tools were renamed or before the
+memory/screenshot features were descoped). Rather than assume, verified
+directly against source before writing any guide content, since incorrect
+tool names in a published migration guide would actively mislead users and
+require a maintainer correction later.
+
+### Proposed Solution
+Maintainer confirmed all three findings in his reply:
+1. Memory tools don't exist — drop from the guide entirely.
+2. Fetch tool is named `web_fetch`, not `fetchURL` — use the correct name.
+3. Screenshot tool doesn't exist; the `web_screenshot` reference in
+   `main.go`'s `printUsage()` help text is a separate, stale bug he'll
+   clean up independently.
+
+He provided the full, definitive 40-tool list across all 7 categories to
+document.
+
+### Implementation Plan
+**Plan:**
+- Draft `docs/migrate-to-relay.md` covering: why-consolidate rationale,
+  before/after config examples, and a full tool-mapping table per category
+  (file, image, pdf, data, text, web, workflow), using only maintainer-
+  confirmed tool names.
+- Validate the guide against a locally running instance of Relay before
+  opening a PR (Go install in progress).
+- Open PR referencing issue #30 once validated.
+
+**Implement:** [Branch/commit links to be added as work progresses —
+not yet created; local draft only so far]
+
+**Review:**
+-
+
+**Evaluate:**
+
+
+## Testing Strategy
+
+### Unit Tests
+N/A — documentation-only contribution, no code changes.
+
+### Integration Tests
+Planned: once Go is installed locally, run Relay directly (`go run . tools
+--json` and/or `relay init`) to confirm every tool name and config example
+in the guide matches real, observed behavior — not just source code review.
+
+## Implementation Notes
+
+(To be completed once the branch is created and guide content is finalized.)
+
+## Maintainer Feedback
+
+Full comment from `tamish560` (issue #30):
+
+> Hey @rubysnewjourney, thanks for digging in. Good catches all around.
+> You're right on all three points:
+> 1. memory tools - don't exist. No memory category is registered. Drop it
+>    from the guide.
+> 2. fetchURL - the actual tool is `web_fetch` under the `web` category.
+>    Use that name.
+> 3. screenshot - no `web_screenshot` tool is registered. The `web` category
+>    only has `web_fetch` and `web_status`. The `web_screenshot` reference
+>    in `main.go` printUsage is stale and will be cleaned up separately.
+>
+> For the guide, document what's actually shipped: file (7), image (6),
+> pdf (5), data (4), text (6), web (2), workflow (8). That's 40 tools
+> across 7 categories. Go ahead and start on `docs/migrate-to-relay.md`.
+> Assigning you now.
+
+(Note: his category counts for image/pdf have small typos — 6/5 listed but
+7/6 tools actually named — the tool names themselves match
+`registrations.go` exactly.)
+
+## Pull Request
+
+**PR Link:** Not yet opened.
+
+**PR Description:** To be drafted once guide is finalized.
+
+**Copy of maintainer feedback:** See above.
+
+### Code Changes
+N/A — documentation only.
+
+## Learnings & Reflections
+
+### Challenges Overcome
+(To be completed — e.g., resolving discrepancies across README vs. docs vs.
+help-text vs. actual source before finding the authoritative file; not
+having Go installed initially and using direct source reading as a
+workaround.)
+
+### What I'd Do Differently Next Time
+(To be completed.)
+
+## Resources Used
+
+- Issue: https://github.com/valtors/relay/issues/30
+- Repo: https://github.com/valtors/relay
+- Fork: https://github.com/rubysnewjourney/relay
+- `docs/FIRST_PR.md` (contribution norms — comment to claim an issue)
+- `docs/ADDING_A_TOOL.md` (tool categories and registration conventions)
+- `tools/registrations.go` (authoritative tool registry — source of truth)
+- `main.go` (printUsage help text — found to contain a stale tool reference)
+- Official reference servers: https://github.com/modelcontextprotocol/servers
+  (used to verify real "before" config examples for `mcp-server-fetch` and
+  `@modelcontextprotocol/server-memory`)
+
 
 ------------------------------------------------------------------------------------------
 Current Contribution #3 - Bug fix
