@@ -3,7 +3,7 @@
 Open source project for CodePath AI 301:
 
 ------------------------------------------------------------------------------------------
-Current Contribution #3
+Current Contribution #3 - Bug fix
 ------------------------------------------------------------------------------------------
 
 **Contribution Number:** *3*
@@ -234,7 +234,7 @@ Plus Test 13 in `test_data_quality.py` (reuses a single pipeline instance across
 - Python interactive shell + `repro_issue_1.py` for reproduction and identity (`is`) verification
 
 ------------------------------------------------------------------------------------------
-Current Contribution #2
+Current Contribution #2 - New Feature
 ------------------------------------------------------------------------------------------
 
 **Contribution Number**: 2
@@ -457,7 +457,7 @@ The maintainer and a core contributor have both leaned toward removal, but the p
 
 
 ------------------------------------------------------------------------------------------
-Previous Contribution #1
+Previous Contribution #1 - Bug fix
 ------------------------------------------------------------------------------------------
 
 # Contribution [1]: [Add sortBy and filter to User.checkouts]
