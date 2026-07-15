@@ -2,12 +2,14 @@
 
 Open source project for CodePath AI 301:
 ------------------------------------------------------------------------------------------
-Current Contribution #4 - Documentation oOnly
+Current Contribution #4 - Documentation Only
 ------------------------------------------------------------------------------------------
 
 **Contribution Number**: 4
 **Student**: Ruby Khatoon
+
 **Issue**: Add migration guide from standalone MCP servers to relay (valtors/relay #30)
+
 **Status**: Assigned, in progress — guide drafted, environment setup pending
 
 ## High-Level Project Summary
