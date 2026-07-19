@@ -82,6 +82,8 @@ claims against the actual codebase before writing anything.)
    source) to get the definitive, authoritative tool list.
 
 ### Reproduction Evidence
+
+**Phase 1 — Initial source-code investigation**
 `tools/registrations.go` shows 7 registration functions
 (`registerFileTools`, `registerImageTools`, `registerPDFTools`,
 `registerDataTools`, `registerTextTools`, `registerWebTools`,
@@ -91,6 +93,7 @@ in the file. The `web` category registers only `web_fetch` and `web_status`
 — no screenshot tool.
 
 This directly contradicted three claims in the original issue text:
+
 | Issue claimed | Source shows |
 |---|---|
 | "relay memory tools" | Does not exist — no memory category/tool anywhere |
@@ -99,7 +102,40 @@ This directly contradicted three claims in the original issue text:
 
 Posted these findings as a clarifying comment on the issue, citing the exact
 file (`tools/registrations.go`) and asking whether to drop the memory/
-screenshot references or document them differently.
+screenshot references or document them differently. Maintainer confirmed all
+three findings and provided the definitive 40-tool list.
+
+**Phase 2 — Live validation against the built binary**
+
+***Environment Setup (completed)***
+- Go installed and verified: `go version` → `go1.26.5 windows/amd64`
+- Built the binary from the fork: `go build -o relay.exe .` in `C:\Users\rubys\Projects\AI301\relay`
+
+***Live tool registry validation***
+Ran `.\relay.exe tools --json` against the built binary and diffed all 40 entries
+against the guide's tool tables — full match on names, categories, and per-category
+counts (file 7, image 7, pdf 6, data 4, text 6, web 2, workflow 8), matching the
+maintainer's confirmed breakdown.
+
+***`--help` output found unreliable***
+Ran `.\relay.exe --help` and found its "Tool categories" listing is stale across
+every category, not just the previously-known `web_screenshot` reference (e.g. it
+lists 4 image tools where 7 actually exist, and lists tool names like `text_extract`,
+`data_yaml` that don't exist in the real registry at all). Confirms `tools --json` /
+`registrations.go` as the only reliable sources.
+
+***`ANTHROPIC_API_KEY` gating confirmed***
+- Source: `doctor.go:327-330` — checks `os.Getenv("ANTHROPIC_API_KEY")` and reports
+  workflow tools as gated on it.
+- Live confirmation: ran `.\relay.exe doctor` with the key unset, which output
+  `! ANTHROPIC_API_KEY / not set; workflow tools require this key` — matching source
+  and matching the guide's claim.
+
+***Other doctor findings (informational, not blocking)***
+- `process lock`: `relay.exe` running during doctor check can cause `EPERM` on
+  Windows reinstalls until stopped.
+- `npm wrapper`: not found in PATH — relevant only if referencing the `npx userelay`
+  install path rather than a locally built binary.
 
 ## Solution Approach
 
