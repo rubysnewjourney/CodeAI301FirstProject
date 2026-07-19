@@ -1,6 +1,7 @@
 # AI301 Open Source contributions
 
 Open source project for CodePath AI 301:
+
 ------------------------------------------------------------------------------------------
 Current Contribution #4 - Documentation Only
 ------------------------------------------------------------------------------------------
@@ -11,7 +12,7 @@ Current Contribution #4 - Documentation Only
 
 **Issue**: Add migration guide from standalone MCP servers to relay (valtors/relay #30)
 
-**Status**: Phase 1 & 2 Completed | Guide and evidence finalized | Ready to branch, commit, and open PR
+**Status**: Phase1 completed | Phase2 |completed |Phase 3 completed | Phase 4 PR #43 opened, awaiting maintainer review
 
 ## High-Level Project Summary
 
@@ -101,6 +102,28 @@ claims against the actual codebase before writing anything.)
     confirmed it live by running `.\relay.exe doctor` with the key unset.
 15. Corrected the `pdf_info` table row in the guide to include `creator` and
     `page dimensions`, per the live tool output's fuller description.
+16. Before branching, synced fork's `main` with upstream `valtors/relay`
+    (now v0.4.10) via `git fetch upstream` / `git merge upstream/main`;
+    re-ran `tools --json` and confirmed all 40 tools still matched.
+17. Found the upstream sync had removed the `--help` "Tool categories"
+    section entirely (no longer just stale), added a new `relay config`
+    command, and added an official `examples/` directory with config files
+    for Claude Desktop, Cursor, VS Code, Docker, and HTTP-server setups.
+18. Compared the guide's config example against `examples/claude-desktop.json`
+    and found a mismatch: the guide used `"command": "relay"` while the
+    official example used `"command": "npx", "args": ["-y", "userelay"]` —
+    also inconsistent with the guide's own stated npx install method.
+19. Updated both config examples in the guide to match the official
+    `npx`/`userelay` form, added a pointer to the `examples/` directory for
+    other editors/setups, and updated the version footer to v0.4.10.
+20. Created branch `docs/migrate-to-relay`, committed the finalized guide,
+    and pushed to the fork.
+21. Ran `go build ./...` locally as a final sanity check before opening the
+    PR — clean, no errors.
+22. Posted a follow-up comment on issue #30 acknowledging the ~1-week gap
+    since the last update, summarizing the validation work completed, and
+    noting the PR was being opened.
+23. Opened PR #43 against `valtors/relay`, referencing `Closes #30`.
 
 ### Reproduction Evidence
 
@@ -158,6 +181,29 @@ lists 4 image tools where 7 actually exist, and lists tool names like `text_extr
 - `npm wrapper`: not found in PATH — relevant only if referencing the `npx userelay`
   install path rather than a locally built binary.
 
+**Phase 3 — Pre-PR upstream sync and config alignment**
+
+Before branching, synced the fork's `main` with upstream `valtors/relay`
+(`git fetch upstream` / `git merge upstream/main`), which brought in changes
+up to v0.4.10:
+- Re-ran `.\relay.exe tools --json` post-sync — all 40 tools still matched
+  the guide exactly, no regressions.
+- The `--help` "Tool categories" section was removed entirely upstream (not
+  merely stale anymore — it's gone), and a new `relay config` command was
+  added.
+- A new official `examples/` directory was added (`claude-desktop.json`,
+  `cursor.json`, `vscode.json`, `docker-compose.yml`, `env-file.example`,
+  `http-server.sh`, `README.md`).
+- Comparing the guide's config example against `examples/claude-desktop.json`
+  surfaced a real mismatch: the guide used `"command": "relay"`, while the
+  official example (and the guide's own stated npx install method) used
+  `"command": "npx", "args": ["-y", "userelay"]`.
+- Fixed both occurrences in the guide to match the official form, added a
+  pointer to `examples/` for other editors/setups, and updated the version
+  footer to reference v0.4.10.
+- Ran `go build ./...` after finalizing — clean build, confirming nothing
+  was broken by a docs-only change.
+
 ## Solution Approach
 
 ### Analysis
@@ -187,17 +233,20 @@ document.
   confirmed tool names. — **Done.**
 - Validate the guide against a locally running instance of Relay before
   opening a PR. — **Done**, see Reproduction Evidence Phase 2.
+- Sync with upstream and re-validate before branching. — **Done**, see
+  Reproduction Evidence Phase 3.
 - Create a feature branch (`docs/migrate-to-relay`) on the fork, commit
-  `docs/migrate-to-relay.md`, and push. — **Not yet started.**
-- Open PR referencing issue #30 once pushed. — **Not yet started.**
+  `docs/migrate-to-relay.md`, and push. — **Done.**
+- Open PR referencing issue #30 once pushed. — **Done**, PR #43.
 
-**Implement:** [Branch not yet created — pending next step]
+**Implement:** Branch `docs/migrate-to-relay`, commit `e867c58`, pushed to
+`rubysnewjourney/relay`.
 
 **Review:**
--
+- Awaiting maintainer review on PR #43.
 
 **Evaluate:**
-
+- Pending PR merge/feedback.
 
 ## Testing Strategy
 
@@ -207,12 +256,15 @@ N/A — documentation-only contribution, no code changes.
 ### Integration Tests
 Ran the built binary directly rather than relying on source review alone:
 - `.\relay.exe tools --json` — confirmed all 40 tool names, categories, and
-  counts in the guide match live output exactly.
+  counts in the guide match live output exactly (both pre- and post-upstream
+  sync).
 - `.\relay.exe --help` — used to cross-check the maintainer's "stale help
-  text" comment; found the staleness extends to every category, not just
-  the `web_screenshot` reference originally flagged.
+  text" comment; found the staleness extended to every category at the time,
+  and was later removed entirely upstream.
 - `.\relay.exe doctor` — confirmed the `ANTHROPIC_API_KEY` gating claim
   live, matching the `doctor.go` source check.
+- `go build ./...` — clean build after finalizing the guide, confirming the
+  docs-only change didn't break anything.
 
 ## Implementation Notes
 
@@ -222,13 +274,13 @@ description, so a reader can scan for their specific use case without
 reading the whole document. Before/after `claude_desktop_config.json`
 snippets are shown twice — once generically for "any standalone server,"
 and once specifically for the fetch-server case, since that's the most
-common single-purpose server in circulation. Workflow tools are called out
-separately at the end since they're not a like-for-like replacement for any
-standalone server, to avoid implying a false migration mapping there. A
-footnote clarifies that the tool list was verified against
-`tools/registrations.go` and confirmed with the maintainer, and that
-`relay --help`'s own category listing is not a reliable source, so future
-readers/contributors don't repeat the same mistake the issue text made.
+common single-purpose server in circulation — and both use the official
+`npx`/`userelay` invocation to stay consistent with the repo's own
+`examples/` directory. Workflow tools are called out separately at the end
+since they're not a like-for-like replacement for any standalone server, to
+avoid implying a false migration mapping there. A footnote clarifies the
+tool list was verified against `tools/registrations.go` and the live binary
+(v0.4.10), and confirmed with the maintainer in issue #30.
 
 ## Maintainer Feedback
 
@@ -252,18 +304,73 @@ Full comment from `tamish560` (issue #30):
 (Note: his category counts for image/pdf have small typos — 6/5 listed but
 7/6 tools actually named — the tool names themselves match
 `registrations.go` exactly, and this was independently re-confirmed against
-the live binary in Phase 2.)
+the live binary in Phase 2, and again after the upstream sync in Phase 3.)
+
+Issue #30 was later labeled `hacktoberfest` by the maintainer. No further
+maintainer comments were posted on the issue before the PR was opened.
+
+Before opening the PR, posted a follow-up comment on issue #30
+acknowledging the ~1-week gap since the last update:
+
+> Hello @tamish560 — apologies for the delay since my last update here.
+> Wanted to close the loop: I've finished validating the guide against the
+> live binary (confirmed all 40 tools, categories, and the
+> ANTHROPIC_API_KEY gating on workflow tools), synced with the latest
+> upstream main (v0.4.10), and aligned the config examples with the new
+> official examples/ directory you added.
+> Opening the PR now — thanks again for your help tracking down the
+> tool-name discrepancies earlier and let me know if there is any further
+> feedback before the PR is merged.
 
 ## Pull Request
 
-**PR Link:** Not yet opened.
+**PR Link:** https://github.com/valtors/relay/pull/43
 
-**PR Description:** To be drafted once the branch is pushed.
+**PR Title:** `docs: add migration guide from standalone MCP servers to Relay (#30)`
 
-**Copy of maintainer feedback:** See above.
+**PR Description:**
+
+```markdown
+## What changed
+Adds `docs/migrate-to-relay.md`, a guide for migrating from multiple standalone
+MCP servers to Relay's single binary — covers before/after config, a full
+40-tool mapping table across all 7 categories, and a pointer to `examples/`
+for other editors/setups.
+
+## Why
+No migration guide existed for users running several standalone MCP servers
+(file, image, PDF, fetch, etc.) who want to consolidate onto Relay.
+Closes #30
+
+## How you tested
+- Verified the issue's original tool-name claims against `tools/registrations.go`
+  before writing anything; found "memory tools," "fetchURL," and "screenshot"
+  tool references don't exist in the current codebase. Flagged these on the
+  issue — @tamish560 confirmed all three and provided the definitive 40-tool
+  list this guide documents.
+- Built the binary locally (`go build -o relay.exe .`) and ran
+  `relay tools --json` to confirm all 40 tool names/categories/counts in the
+  guide match live output exactly.
+- Confirmed the `ANTHROPIC_API_KEY` gating on workflow tools via `doctor.go`
+  and a live `relay doctor` run.
+- Synced with upstream `main` (v0.4.10) before finalizing and aligned the
+  guide's config examples to the official `examples/claude-desktop.json`
+  (`npx`/`userelay` form) so this guide stays consistent with the rest of
+  the docs.
+- Ran `go build ./...` after the change to confirm nothing was broken — clean.
+
+## Checklist
+- [x] `gofmt -w .` is clean — N/A, no Go code changed
+- [x] `go vet ./...` is clean — N/A, no Go code changed
+- [x] `go test ./...` passes — N/A, no Go code changed
+- [x] `go build ./...` succeeds (for release changes) — ran locally, clean build
+- [x] README/ADDING_A_TOOL docs updated if user-facing — new guide added under `docs/`
+- [x] PR is small and focused (one change) — single new markdown file
+- [x] Issue is linked with `Closes #123` if it exists — `Closes #30`
+```
 
 ### Code Changes
-N/A — documentation only.
+N/A — documentation only. Single new file: `docs/migrate-to-relay.md`.
 
 ## Learnings & Reflections
 
@@ -290,6 +397,13 @@ N/A — documentation only.
   confirmed it live with `relay doctor`, which is a faster and more reliable path
   to the same evidence.
 
+- **Repo state shifting mid-contribution.** Between finishing initial validation
+  and opening the PR, upstream `main` advanced to v0.4.10 — removing the stale
+  `--help` section I'd flagged and adding an official `examples/` directory that
+  didn't match one of my guide's config examples. Catching this before opening
+  the PR (rather than after a reviewer flagged it) meant syncing with upstream
+  and re-validating became a standard step, not an afterthought.
+
 ### What I'd Do Differently Next Time
 
 - Run `relay doctor` and `relay tools --json` as a first step in any Relay
@@ -301,16 +415,24 @@ N/A — documentation only.
   as soon as the first mismatch was found, rather than batching all three findings
   into a single comment.
 
+- Sync with upstream earlier and more than once during a longer-running
+  contribution, rather than only right before branching — it would have
+  surfaced the `examples/` directory and config mismatch sooner.
+
 ## Resources Used
 
 - Issue: https://github.com/valtors/relay/issues/30
+- PR: https://github.com/valtors/relay/pull/43
 - Repo: https://github.com/valtors/relay
 - Fork: https://github.com/rubysnewjourney/relay
 - `docs/FIRST_PR.md` (contribution norms — comment to claim an issue)
 - `docs/ADDING_A_TOOL.md` (tool categories and registration conventions)
 - `tools/registrations.go` (authoritative tool registry — source of truth)
-- `main.go` (printUsage help text — found to contain a stale tool reference)
+- `main.go` (printUsage help text — found to contain stale references, since
+  removed upstream)
 - `doctor.go` (source of the `ANTHROPIC_API_KEY` gating check)
+- `examples/` directory (official config examples added upstream — used to
+  align the guide's config snippets)
 - Official reference servers: https://github.com/modelcontextprotocol/servers
   (used to verify real "before" config examples for `mcp-server-fetch` and
   `@modelcontextprotocol/server-memory`)
