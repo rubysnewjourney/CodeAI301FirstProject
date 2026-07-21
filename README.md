@@ -12,7 +12,7 @@ Current Contribution #4 - Documentation Only
 
 **Issue**: Add migration guide from standalone MCP servers to relay (valtors/relay #30)
 
-**Status**: Phase1 completed | Phase2 |completed |Phase 3 completed | Phase 4 PR #43 opened, awaiting maintainer review
+**Status**: Phase 1 completed | Phase 2 completed | Phase 3 completed | Phase 4 completed — PR #43 merged
 
 ## High-Level Project Summary
 
@@ -124,6 +124,8 @@ claims against the actual codebase before writing anything.)
     since the last update, summarizing the validation work completed, and
     noting the PR was being opened.
 23. Opened PR #43 against `valtors/relay`, referencing `Closes #30`.
+24. PR #43 was reviewed and merged by the maintainer (see Maintainer
+    Feedback below for the merge comment).
 
 ### Reproduction Evidence
 
@@ -243,10 +245,16 @@ document.
 `rubysnewjourney/relay`.
 
 **Review:**
-- Awaiting maintainer review on PR #43.
+- Maintainer reviewed and merged PR #43. Full comment below (Maintainer
+  Feedback — Post-Merge).
 
 **Evaluate:**
-- Pending PR merge/feedback.
+- Merged and closed successfully. The maintainer specifically called out
+  the tool mapping tables and before/after config examples as exactly what
+  a migrating user needs, and noted the live-binary validation approach
+  positively. No requested changes or follow-up revisions were needed
+  before merge — the upstream-sync and config-alignment work done in
+  Phase 3 meant the PR was mergeable as submitted.
 
 ## Testing Strategy
 
@@ -284,7 +292,7 @@ tool list was verified against `tools/registrations.go` and the live binary
 
 ## Maintainer Feedback
 
-Full comment from `tamish560` (issue #30):
+Full comment from `tamish560` (issue #30, pre-merge confirmation):
 
 > Hey @rubysnewjourney, thanks for digging in. Good catches all around.
 > You're right on all three points:
@@ -322,11 +330,22 @@ acknowledging the ~1-week gap since the last update:
 > tool-name discrepancies earlier and let me know if there is any further
 > feedback before the PR is merged.
 
+**Maintainer Feedback — Post-Merge**
+
+Comment from `tamish560` on PR #43, 10 hours after this section was last
+updated:
+
+> Merged. Great guide, the tool mapping tables and before/after config
+> examples are exactly what someone migrating from standalone servers
+> needs. Thanks for validating against the live binary.
+
 ## Pull Request
 
 **PR Link:** https://github.com/valtors/relay/pull/43
 
 **PR Title:** `docs: add migration guide from standalone MCP servers to Relay (#30)`
+
+**PR Status:** Merged
 
 **PR Description:**
 
@@ -435,9 +454,7 @@ N/A — documentation only. Single new file: `docs/migrate-to-relay.md`.
   align the guide's config snippets)
 - Official reference servers: https://github.com/modelcontextprotocol/servers
   (used to verify real "before" config examples for `mcp-server-fetch` and
-  `@modelcontextprotocol/server-memory`)
-
-------------------------------------------------------------------------------------------
+  `@modelcontextprotocol/server-memory`)------------------------------------------------------------------------------------------
 Current Contribution #3 - Bug fix
 ------------------------------------------------------------------------------------------
 
